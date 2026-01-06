@@ -3,40 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>吉祥話拼字大挑戰</title>
+    <title>吉祥話拼字遊戲</title>
     <style>
         body {
             font-family: "Microsoft JhengHei", sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #fdf2f2;
+            background-color: #fff5f5;
             color: #333;
             padding: 20px;
+            margin: 0;
         }
 
-        h1 {
-            color: #d32f2f;
-            margin-bottom: 10px;
-        }
+        h1 { color: #d32f2f; margin-bottom: 5px; }
+        .subtitle { color: #888; margin-bottom: 20px; }
 
-        .instruction {
-            margin-bottom: 20px;
-            color: #666;
-        }
-
-        /* 8x8 網格設定 */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(8, 45px);
-            grid-template-rows: repeat(8, 45px);
-            gap: 5px;
+        /* 遊戲網格容器 */
+        .grid-container {
             background-color: #d32f2f;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: grid;
+            gap: 6px;
         }
 
+        /* 格子樣式 */
         .cell {
             width: 45px;
             height: 45px;
@@ -48,158 +41,171 @@
             font-weight: bold;
             cursor: pointer;
             user-select: none;
-            border-radius: 4px;
-            transition: background 0.2s;
+            border-radius: 6px;
+            transition: all 0.2s;
         }
 
-        .cell:hover {
-            background-color: #ffebee;
+        .cell:hover { background-color: #fff0f0; }
+        .cell.selected { background-color: #ffc107; color: #000; transform: scale(0.95); }
+
+        /* 下方資訊區 */
+        .info-panel {
+            text-align: center;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 400px;
         }
 
-        .cell.selected {
-            background-color: #ffc107;
-            color: black;
-        }
-
-        .controls {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .display-area {
-            font-size: 1.5rem;
-            min-height: 40px;
+        .display-text {
+            font-size: 1.4rem;
             color: #d32f2f;
+            min-height: 1.6rem;
+            margin-bottom: 10px;
             font-weight: bold;
+        }
+
+        #message { height: 20px; font-size: 0.9rem; margin-bottom: 15px; }
+
+        /* 按鈕樣式 */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 10px;
         }
 
         button {
-            padding: 10px 30px;
-            font-size: 1.1rem;
-            background-color: #d32f2f;
-            color: white;
+            padding: 10px 20px;
             border: none;
-            border-radius: 25px;
+            border-radius: 8px;
             cursor: pointer;
-            box-shadow: 0 4px 0 #b71c1c;
-        }
-
-        button:active {
-            box-shadow: none;
-            transform: translateY(4px);
-        }
-
-        #message {
-            margin-top: 10px;
+            font-size: 1rem;
             font-weight: bold;
+            transition: 0.3s;
         }
+
+        .next-btn { background-color: #d32f2f; color: white; }
+        .mode-btn { background-color: #eee; color: #555; }
+        .mode-btn.active { background-color: #333; color: white; }
+
+        button:active { opacity: 0.8; }
     </style>
 </head>
 <body>
 
-    <h1>🧧 新春尋寶：祝福拼拼樂</h1>
-    <p class="instruction">請點擊格子拼出正確的祝福語（例如：平+安）</p>
+    <h1>🧧 祝賀詞連連看</h1>
+    <p class="subtitle">選取文字組成祝福語，挑戰你的眼力！</p>
 
-    <div class="grid" id="grid"></div>
+    <div id="grid" class="grid-container"></div>
 
-    <div class="controls">
-        <div class="display-area" id="selectedChars">目前的組合：-</div>
-        <button onclick="checkAnswer()">下一步 (檢查答案)</button>
+    <div class="info-panel">
+        <div id="selectedChars" class="display-text">-</div>
         <div id="message"></div>
+        <button class="next-btn" onclick="checkAnswer()">確認組合</button>
+        
+        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ddd;">
+        
+        <p>切換難度版本：</p>
+        <div class="btn-group">
+            <button class="mode-btn" id="btn6" onclick="changeMode(6)">6 x 6 模式</button>
+            <button class="mode-btn active" id="btn8" onclick="changeMode(8)">8 x 8 模式</button>
+        </div>
     </div>
 
     <script>
-        const size = 8;
-        const words = ["平安健康", "財源廣進", "萬事如意", "心想事成", "大吉大利", "步步高升", "招財進寶", "金玉滿堂"];
-        const fillerChars = "喜樂春福吉祥富貴安康順利發財";
+        const words = ["平安健康", "財源廣進", "萬事如意", "心想事成", "大吉大利", "步步高升", "招財進寶", "金玉滿堂", "龍馬精神", "歲歲平安"];
+        const fillerChars = "喜樂春福吉祥富貴安康順利發財美滿如意慶餘年";
         
+        let currentSize = 8;
         let selectedChars = [];
-        let gridArray = Array(size * size).fill('');
 
-        // 初始化遊戲
-        function initGame() {
+        function initGame(size) {
+            currentSize = size;
             const gridElement = document.getElementById('grid');
+            gridElement.innerHTML = ''; // 清空舊內容
             
-            // 隨機放入詞彙
-            words.forEach(word => {
-                let placed = false;
-                while (!placed) {
-                    let pos = Math.floor(Math.random() * (size * size - word.length));
-                    // 簡單檢查是否有空間 (這裡僅示範，未做複雜碰撞檢查)
-                    if (gridArray[pos] === '') {
-                        for (let i = 0; i < word.length; i++) {
-                            gridArray[pos + i] = word[i];
-                        }
-                        placed = true;
+            // 動態調整 Grid 欄數
+            gridElement.style.gridTemplateColumns = `repeat(${size}, 45px)`;
+
+            let gridArray = Array(size * size).fill('');
+
+            // 隨機放入幾個祝福語
+            const numWordsToPlace = size === 6 ? 4 : 7;
+            for(let i=0; i < numWordsToPlace; i++) {
+                let word = words[Math.floor(Math.random() * words.length)];
+                let pos = Math.floor(Math.random() * (size * size - word.length));
+                // 簡易檢查位置是否已被佔用
+                if (gridArray[pos] === '') {
+                    for (let j = 0; j < word.length; j++) {
+                        gridArray[pos + j] = word[j];
                     }
                 }
-            });
+            }
 
-            // 填滿剩餘空格
+            // 填滿剩下空格
             for (let i = 0; i < size * size; i++) {
                 if (gridArray[i] === '') {
                     gridArray[i] = fillerChars[Math.floor(Math.random() * fillerChars.length)];
                 }
             }
 
-            // 渲染畫面
-            gridArray.forEach((char, index) => {
+            // 繪製格子
+            gridArray.forEach((char) => {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.textContent = char;
-                cell.onclick = () => toggleSelect(cell, char);
+                cell.onclick = () => {
+                    cell.classList.toggle('selected');
+                    if (cell.classList.contains('selected')) {
+                        selectedChars.push(char);
+                    } else {
+                        const idx = selectedChars.lastIndexOf(char);
+                        if (idx > -1) selectedChars.splice(idx, 1);
+                    }
+                    updateDisplay();
+                };
                 gridElement.appendChild(cell);
             });
-        }
-
-        function toggleSelect(cell, char) {
-            if (cell.classList.contains('selected')) {
-                cell.classList.remove('selected');
-                // 移除最後一個選取的字
-                const index = selectedChars.lastIndexOf(char);
-                if (index > -1) selectedChars.splice(index, 1);
-            } else {
-                cell.classList.add('selected');
-                selectedChars.push(char);
-            }
-            updateDisplay();
+            
+            resetSelection();
         }
 
         function updateDisplay() {
-            document.getElementById('selectedChars').textContent = "目前的組合：" + selectedChars.join('');
+            const display = document.getElementById('selectedChars');
+            display.textContent = selectedChars.length > 0 ? selectedChars.join('') : "請選取文字";
         }
 
         function checkAnswer() {
             const currentString = selectedChars.join('');
-            const message = document.getElementById('message');
-            
-            // 檢查是否包含在詞庫中
-            const found = words.some(word => word === currentString || word.includes(currentString) && currentString.length > 1);
+            const msg = document.getElementById('message');
             
             if (words.includes(currentString)) {
-                message.textContent = `恭喜！「${currentString}」是非常棒的祝福！`;
-                message.style.color = "green";
-                // 答對後清除選取以便下一題
-                resetSelection();
-            } else if (currentString.length < 2) {
-                message.textContent = "請至少選擇兩個字。";
-                message.style.color = "orange";
+                msg.textContent = "✅ 太棒了！這是正確的祝福語！";
+                msg.style.color = "green";
+                setTimeout(resetSelection, 1000);
             } else {
-                message.textContent = "這好像不是一個預設的祝福語，再試試看！";
-                message.style.color = "red";
+                msg.textContent = "❌ 再試試看，目前還沒拼對喔。";
+                msg.style.color = "red";
             }
         }
 
         function resetSelection() {
             selectedChars = [];
             document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
+            document.getElementById('message').textContent = "";
             updateDisplay();
         }
 
-        initGame();
+        function changeMode(size) {
+            // 切換按鈕樣式
+            document.getElementById('btn6').classList.toggle('active', size === 6);
+            document.getElementById('btn8').classList.toggle('active', size === 8);
+            // 重新初始化遊戲
+            initGame(size);
+        }
+
+        // 初始啟動 8x8
+        initGame(8);
     </script>
 </body>
 </html>
