@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吉祥話拼字大挑戰</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fdf2f2;
+            color: #333;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #d32f2f;
+            margin-bottom: 10px;
+        }
+
+        .instruction {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        /* 8x8 網格設定 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 45px);
+            grid-template-rows: repeat(8, 45px);
+            gap: 5px;
+            background-color: #d32f2f;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .cell {
+            width: 45px;
+            height: 45px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .cell:hover {
+            background-color: #ffebee;
+        }
+
+        .cell.selected {
+            background-color: #ffc107;
+            color: black;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .display-area {
+            font-size: 1.5rem;
+            min-height: 40px;
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #b71c1c;
+        }
+
+        button:active {
+            box-shadow: none;
+            transform: translateY(4px);
+        }
+
+        #message {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🧧 新春尋寶：祝福拼拼樂</h1>
+    <p class="instruction">請點擊格子拼出正確的祝福語（例如：平+安）</p>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="controls">
+        <div class="display-area" id="selectedChars">目前的組合：-</div>
+        <button onclick="checkAnswer()">下一步 (檢查答案)</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const size = 8;
+        const words = ["平安健康", "財源廣進", "萬事如意", "心想事成", "大吉大利", "步步高升", "招財進寶", "金玉滿堂"];
+        const fillerChars = "喜樂春福吉祥富貴安康順利發財";
+        
+        let selectedChars = [];
+        let gridArray = Array(size * size).fill('');
+
+        // 初始化遊戲
+        function initGame() {
+            const gridElement = document.getElementById('grid');
+            
+            // 隨機放入詞彙
+            words.forEach(word => {
+                let placed = false;
+                while (!placed) {
+                    let pos = Math.floor(Math.random() * (size * size - word.length));
+                    // 簡單檢查是否有空間 (這裡僅示範，未做複雜碰撞檢查)
+                    if (gridArray[pos] === '') {
+                        for (let i = 0; i < word.length; i++) {
+                            gridArray[pos + i] = word[i];
+                        }
+                        placed = true;
+                    }
+                }
+            });
+
+            // 填滿剩餘空格
+            for (let i = 0; i < size * size; i++) {
+                if (gridArray[i] === '') {
+                    gridArray[i] = fillerChars[Math.floor(Math.random() * fillerChars.length)];
+                }
+            }
+
+            // 渲染畫面
+            gridArray.forEach((char, index) => {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.textContent = char;
+                cell.onclick = () => toggleSelect(cell, char);
+                gridElement.appendChild(cell);
+            });
+        }
+
+        function toggleSelect(cell, char) {
+            if (cell.classList.contains('selected')) {
+                cell.classList.remove('selected');
+                // 移除最後一個選取的字
+                const index = selectedChars.lastIndexOf(char);
+                if (index > -1) selectedChars.splice(index, 1);
+            } else {
+                cell.classList.add('selected');
+                selectedChars.push(char);
+            }
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('selectedChars').textContent = "目前的組合：" + selectedChars.join('');
+        }
+
+        function checkAnswer() {
+            const currentString = selectedChars.join('');
+            const message = document.getElementById('message');
+            
+            // 檢查是否包含在詞庫中
+            const found = words.some(word => word === currentString || word.includes(currentString) && currentString.length > 1);
+            
+            if (words.includes(currentString)) {
+                message.textContent = `恭喜！「${currentString}」是非常棒的祝福！`;
+                message.style.color = "green";
+                // 答對後清除選取以便下一題
+                resetSelection();
+            } else if (currentString.length < 2) {
+                message.textContent = "請至少選擇兩個字。";
+                message.style.color = "orange";
+            } else {
+                message.textContent = "這好像不是一個預設的祝福語，再試試看！";
+                message.style.color = "red";
+            }
+        }
+
+        function resetSelection() {
+            selectedChars = [];
+            document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
+            updateDisplay();
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
