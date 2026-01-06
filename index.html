@@ -3,209 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>吉祥話拼字遊戲</title>
+    <title>2026 新春尋寶拼字趣</title>
     <style>
+        :root {
+            --primary-red: #d32f2f;
+            --line-color: #eeeeee; /* 線條顏色 */
+            --text-dark: #1a1a1a;
+            --text-light: #999;
+        }
+
         body {
-            font-family: "Microsoft JhengHei", sans-serif;
+            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+            background-color: #ffffff;
+            margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #fff5f5;
-            color: #333;
-            padding: 20px;
-            margin: 0;
+            min-height: 100vh;
+            padding: 40px 0;
         }
 
-        h1 { color: #d32f2f; margin-bottom: 5px; }
-        .subtitle { color: #888; margin-bottom: 20px; }
+        header { text-align: center; margin-bottom: 25px; width: 85%; }
+        h1 { font-size: 1.6rem; margin: 0; letter-spacing: 4px; }
+        .en-title { font-size: 0.75rem; color: var(--text-light); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
+        .guide-text { font-size: 0.9rem; color: #666; margin-top: 15px; }
 
-        /* 遊戲網格容器 */
+        /* 網格容器：解決線條消失的關鍵 */
         .grid-container {
-            background-color: #d32f2f;
-            padding: 12px;
-            border-radius: 12px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             display: grid;
-            gap: 6px;
+            width: 85vw;
+            max-width: 450px;
+            margin: 20px 0;
+            /* 補足右邊與下邊的框線 */
+            border-right: 0.5px solid var(--line-color);
+            border-bottom: 0.5px solid var(--line-color);
+            box-sizing: border-box;
         }
 
-        /* 格子樣式 */
         .cell {
-            width: 45px;
-            height: 45px;
-            background-color: white;
+            background-color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.2rem;
-            font-weight: bold;
             cursor: pointer;
             user-select: none;
-            border-radius: 6px;
-            transition: all 0.2s;
+            aspect-ratio: 1 / 1;
+            /* 每個格子負責畫左邊與上邊 */
+            border-left: 0.5px solid var(--line-color);
+            border-top: 0.5px solid var(--line-color);
+            transition: all 0.2s ease;
+            box-sizing: border-box;
         }
 
-        .cell:hover { background-color: #fff0f0; }
-        .cell.selected { background-color: #ffc107; color: #000; transform: scale(0.95); }
-
-        /* 下方資訊區 */
-        .info-panel {
-            text-align: center;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 400px;
+        .cell.selected {
+            background-color: var(--primary-red);
+            color: #fff;
+            /* 選中時讓邊框維持原樣，不影響佈局 */
         }
 
-        .display-text {
-            font-size: 1.4rem;
-            color: #d32f2f;
-            min-height: 1.6rem;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
+        /* 底部操作區 */
+        .footer-ui { width: 85%; max-width: 450px; text-align: center; margin-top: 10px; }
+        #selectedChars { font-size: 1.6rem; height: 40px; color: var(--primary-red); font-weight: 500; letter-spacing: 6px; }
+        #status-msg { height: 20px; margin-bottom: 20px; font-size: 0.85rem; }
 
-        #message { height: 20px; font-size: 0.9rem; margin-bottom: 15px; }
-
-        /* 按鈕樣式 */
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        button {
-            padding: 10px 20px;
+        .submit-btn {
+            background: var(--text-dark);
+            color: #fff;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            width: 180px;
+            padding: 12px 0;
             font-size: 1rem;
-            font-weight: bold;
-            transition: 0.3s;
+            letter-spacing: 5px;
+            cursor: pointer;
+            border-radius: 2px;
         }
 
-        .next-btn { background-color: #d32f2f; color: white; }
-        .mode-btn { background-color: #eee; color: #555; }
-        .mode-btn.active { background-color: #333; color: white; }
+        .mode-switcher {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
 
-        button:active { opacity: 0.8; }
+        .mode-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 0.75rem;
+            cursor: pointer;
+            padding: 5px 0;
+        }
+
+        .mode-btn.active {
+            color: var(--text-dark);
+            font-weight: 600;
+            border-bottom: 2px solid var(--text-dark);
+        }
     </style>
 </head>
 <body>
 
-    <h1>🧧 祝賀詞連連看</h1>
-    <p class="subtitle">選取文字組成祝福語，挑戰你的眼力！</p>
+    <header>
+        <h1>2026 新春尋寶拼字趣</h1>
+        <div class="en-title">Lunar New Year Word Puzzle 2026</div>
+        <p class="guide-text">選取第一眼看到的關鍵詞</p>
+    </header>
 
     <div id="grid" class="grid-container"></div>
 
-    <div class="info-panel">
-        <div id="selectedChars" class="display-text">-</div>
-        <div id="message"></div>
-        <button class="next-btn" onclick="checkAnswer()">確認組合</button>
-        
-        <hr style="margin: 30px 0; border: 0; border-top: 1px solid #ddd;">
-        
-        <p>切換難度版本：</p>
-        <div class="btn-group">
-            <button class="mode-btn" id="btn6" onclick="changeMode(6)">6 x 6 模式</button>
-            <button class="mode-btn active" id="btn8" onclick="changeMode(8)">8 x 8 模式</button>
+    <div class="footer-ui">
+        <div id="selectedChars"></div>
+        <div id="status-msg"></div>
+        <button class="submit-btn" onclick="checkAnswer()">提交</button>
+
+        <div class="mode-switcher">
+            <button class="mode-btn" id="btn6-6" onclick="changeMode(6, 6)">6 × 6 MODE</button>
+            <button class="mode-btn" id="btn6-8" onclick="changeMode(6, 8)">6 × 8 MODE</button>
+            <button class="mode-btn active" id="btn8-8" onclick="changeMode(8, 8)">8 × 8 MODE</button>
         </div>
     </div>
 
     <script>
-        const words = ["平安健康", "財源廣進", "萬事如意", "心想事成", "大吉大利", "步步高升", "招財進寶", "金玉滿堂", "龍馬精神", "歲歲平安"];
-        const fillerChars = "喜樂春福吉祥富貴安康順利發財美滿如意慶餘年";
-        
-        let currentSize = 8;
+        const words = ["平安健康", "財源廣進", "萬事如意", "心想事成", "大吉大利", "步步高升", "招財進寶", "金玉滿堂", "龍馬精神", "福氣滿門"];
+        const fillerChars = "喜樂春福吉祥富貴安康順利發財年慶餘";
         let selectedChars = [];
 
-        function initGame(size) {
-            currentSize = size;
+        function initGame(cols, rows) {
             const gridElement = document.getElementById('grid');
-            gridElement.innerHTML = ''; // 清空舊內容
+            gridElement.innerHTML = '';
+            gridElement.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+            // 計算動態字體：6欄大字，8欄小字
+            let fontSize = (cols === 6) ? "8vw" : "5.5vw";
+            let maxFontSize = (cols === 6) ? "32px" : "22px";
+
+            let totalCells = cols * rows;
+            let gridArray = Array(totalCells).fill('');
             
-            // 動態調整 Grid 欄數
-            gridElement.style.gridTemplateColumns = `repeat(${size}, 45px)`;
-
-            let gridArray = Array(size * size).fill('');
-
-            // 隨機放入幾個祝福語
-            const numWordsToPlace = size === 6 ? 4 : 7;
-            for(let i=0; i < numWordsToPlace; i++) {
-                let word = words[Math.floor(Math.random() * words.length)];
-                let pos = Math.floor(Math.random() * (size * size - word.length));
-                // 簡易檢查位置是否已被佔用
-                if (gridArray[pos] === '') {
-                    for (let j = 0; j < word.length; j++) {
-                        gridArray[pos + j] = word[j];
+            // 隨機置入詞彙 (洗牌確保每次詞彙不同)
+            const currentWords = [...words].sort(() => Math.random() - 0.5).slice(0, (cols === 6 ? 4 : 8));
+            
+            currentWords.forEach(word => {
+                let placed = false;
+                let attempts = 0;
+                while (!placed && attempts < 100) {
+                    let pos = Math.floor(Math.random() * (totalCells - word.length));
+                    if (gridArray.slice(pos, pos + word.length).every(c => c === '')) {
+                        for (let i = 0; i < word.length; i++) gridArray[pos + i] = word[i];
+                        placed = true;
                     }
+                    attempts++;
                 }
+            });
+
+            for (let i = 0; i < totalCells; i++) {
+                if (gridArray[i] === '') gridArray[i] = fillerChars[Math.floor(Math.random() * fillerChars.length)];
             }
 
-            // 填滿剩下空格
-            for (let i = 0; i < size * size; i++) {
-                if (gridArray[i] === '') {
-                    gridArray[i] = fillerChars[Math.floor(Math.random() * fillerChars.length)];
-                }
-            }
-
-            // 繪製格子
             gridArray.forEach((char) => {
                 const cell = document.createElement('div');
                 cell.classList.add('cell');
+                cell.style.fontSize = fontSize;
+                // 電腦版文字大小上限
+                if (window.innerWidth > 450) cell.style.fontSize = maxFontSize;
                 cell.textContent = char;
+                
                 cell.onclick = () => {
                     cell.classList.toggle('selected');
                     if (cell.classList.contains('selected')) {
                         selectedChars.push(char);
                     } else {
-                        const idx = selectedChars.lastIndexOf(char);
+                        const idx = selectedChars.indexOf(char);
                         if (idx > -1) selectedChars.splice(idx, 1);
                     }
                     updateDisplay();
                 };
                 gridElement.appendChild(cell);
             });
-            
             resetSelection();
         }
 
         function updateDisplay() {
-            const display = document.getElementById('selectedChars');
-            display.textContent = selectedChars.length > 0 ? selectedChars.join('') : "請選取文字";
+            document.getElementById('selectedChars').textContent = selectedChars.join('');
         }
 
         function checkAnswer() {
             const currentString = selectedChars.join('');
-            const msg = document.getElementById('message');
-            
+            const msg = document.getElementById('status-msg');
             if (words.includes(currentString)) {
-                msg.textContent = "✅ 太棒了！這是正確的祝福語！";
-                msg.style.color = "green";
+                msg.innerText = "✦ 找到祝福了 ✦";
+                msg.style.color = "var(--primary-red)";
                 setTimeout(resetSelection, 1000);
-            } else {
-                msg.textContent = "❌ 再試試看，目前還沒拼對喔。";
-                msg.style.color = "red";
+            } else if (currentString.length > 0) {
+                msg.innerText = "這好像不是預設的祝福語，再試試看！";
+                msg.style.color = "#ccc";
             }
         }
 
         function resetSelection() {
             selectedChars = [];
             document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
-            document.getElementById('message').textContent = "";
+            document.getElementById('status-msg').innerText = "";
             updateDisplay();
         }
 
-        function changeMode(size) {
-            // 切換按鈕樣式
-            document.getElementById('btn6').classList.toggle('active', size === 6);
-            document.getElementById('btn8').classList.toggle('active', size === 8);
-            // 重新初始化遊戲
-            initGame(size);
+        function changeMode(c, r) {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn${c}-${r}`).classList.add('active');
+            initGame(c, r);
         }
 
-        // 初始啟動 8x8
-        initGame(8);
+        // 初始化
+        initGame(8, 8);
+        
+        // 視窗縮放時重新調整文字（避免電腦/手機切換時字體出錯）
+        window.addEventListener('resize', () => {
+            const activeBtn = document.querySelector('.mode-btn.active').id;
+            if (activeBtn === 'btn6-6') initGame(6, 6);
+            else if (activeBtn === 'btn6-8') initGame(6, 8);
+            else initGame(8, 8);
+        });
     </script>
 </body>
 </html>
