@@ -1,230 +1,269 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 新春尋寶拼字趣</title>
-    <style>
-        :root {
-            --primary-red: #d32f2f;
-            --line-color: #eeeeee; /* 線條顏色 */
-            --text-dark: #1a1a1a;
-            --text-light: #999;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 新春尋寶拼字趣</title>
 
-        body {
-            font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
-            background-color: #ffffff;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 40px 0;
-        }
+<style>
+:root {
+    --primary-red: #d32f2f;
+    --line-color: #eeeeee;
+    --text-dark: #1a1a1a;
+    --text-light: #999;
+}
 
-        header { text-align: center; margin-bottom: 25px; width: 85%; }
-        h1 { font-size: 1.6rem; margin: 0; letter-spacing: 4px; }
-        .en-title { font-size: 0.75rem; color: var(--text-light); letter-spacing: 2px; text-transform: uppercase; margin-top: 5px; }
-        .guide-text { font-size: 0.9rem; color: #666; margin-top: 15px; }
+body {
+    font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 40px 0;
+}
 
-        /* 網格容器：解決線條消失的關鍵 */
-        .grid-container {
-            display: grid;
-            width: 85vw;
-            max-width: 450px;
-            margin: 20px 0;
-            /* 補足右邊與下邊的框線 */
-            border-right: 0.5px solid var(--line-color);
-            border-bottom: 0.5px solid var(--line-color);
-            box-sizing: border-box;
-        }
+header { text-align: center; margin-bottom: 25px; width: 85%; }
+h1 { font-size: 1.6rem; margin: 0; letter-spacing: 4px; }
+.en-title { font-size: 0.75rem; color: var(--text-light); letter-spacing: 2px; margin-top: 5px; }
+.guide-text { font-size: 0.9rem; color: #666; margin-top: 15px; }
 
-        .cell {
-            background-color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            user-select: none;
-            aspect-ratio: 1 / 1;
-            /* 每個格子負責畫左邊與上邊 */
-            border-left: 0.5px solid var(--line-color);
-            border-top: 0.5px solid var(--line-color);
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-        }
+.grid-container {
+    display: grid;
+    width: 85vw;
+    max-width: 450px;
+    margin: 20px 0;
+    border-right: 0.5px solid var(--line-color);
+    border-bottom: 0.5px solid var(--line-color);
+}
 
-        .cell.selected {
-            background-color: var(--primary-red);
-            color: #fff;
-            /* 選中時讓邊框維持原樣，不影響佈局 */
-        }
+.cell {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    border-left: 0.5px solid var(--line-color);
+    border-top: 0.5px solid var(--line-color);
+    transition: background-color 0.2s;
+}
 
-        /* 底部操作區 */
-        .footer-ui { width: 85%; max-width: 450px; text-align: center; margin-top: 10px; }
-        #selectedChars { font-size: 1.6rem; height: 40px; color: var(--primary-red); font-weight: 500; letter-spacing: 6px; }
-        #status-msg { height: 20px; margin-bottom: 20px; font-size: 0.85rem; }
+.cell.selected {
+    background-color: var(--primary-red);
+    color: #fff;
+}
 
-        .submit-btn {
-            background: var(--text-dark);
-            color: #fff;
-            border: none;
-            width: 180px;
-            padding: 12px 0;
-            font-size: 1rem;
-            letter-spacing: 5px;
-            cursor: pointer;
-            border-radius: 2px;
-        }
+.footer-ui {
+    width: 85%;
+    max-width: 450px;
+    text-align: center;
+}
 
-        .mode-switcher {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
+#selectedChars {
+    font-size: 1.6rem;
+    height: 40px;
+    color: var(--primary-red);
+    letter-spacing: 6px;
+}
 
-        .mode-btn {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            font-size: 0.75rem;
-            cursor: pointer;
-            padding: 5px 0;
-        }
+#status-msg {
+    height: 20px;
+    margin-bottom: 20px;
+    font-size: 0.85rem;
+}
 
-        .mode-btn.active {
-            color: var(--text-dark);
-            font-weight: 600;
-            border-bottom: 2px solid var(--text-dark);
-        }
-    </style>
+.submit-btn {
+    background: var(--text-dark);
+    color: #fff;
+    border: none;
+    width: 180px;
+    padding: 12px 0;
+    font-size: 1rem;
+    letter-spacing: 5px;
+    cursor: pointer;
+}
+
+.mode-switcher {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+}
+
+.mode-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.mode-btn.active {
+    color: var(--text-dark);
+    font-weight: 600;
+    border-bottom: 2px solid var(--text-dark);
+}
+</style>
 </head>
+
 <body>
 
-    <header>
-        <h1>2026 新春尋寶拼字趣</h1>
-        <div class="en-title">Lunar New Year Word Puzzle 2026</div>
-        <p class="guide-text">選取第一眼看到的關鍵詞</p>
-    </header>
+<header>
+    <h1>2026 新春尋寶拼字趣</h1>
+    <div class="en-title">Lunar New Year Word Search 2026</div>
+    <p class="guide-text">選取第一眼看到的關鍵詞</p>
+</header>
 
-    <div id="grid" class="grid-container"></div>
+<div id="grid" class="grid-container"></div>
 
-    <div class="footer-ui">
-        <div id="selectedChars"></div>
-        <div id="status-msg"></div>
-        <button class="submit-btn" onclick="checkAnswer()">提交</button>
+<div class="footer-ui">
+    <div id="selectedChars"></div>
+    <div id="status-msg"></div>
+    <button class="submit-btn" onclick="checkAnswer()">提交</button>
 
-        <div class="mode-switcher">
-            <button class="mode-btn" id="btn6-6" onclick="changeMode(6, 6)">6 × 6 MODE</button>
-            <button class="mode-btn" id="btn6-8" onclick="changeMode(6, 8)">6 × 8 MODE</button>
-            <button class="mode-btn active" id="btn8-8" onclick="changeMode(8, 8)">8 × 8 MODE</button>
-        </div>
+    <div class="mode-switcher">
+        <button class="mode-btn" id="btn6-6" onclick="changeMode(6,6)">6×6</button>
+        <button class="mode-btn" id="btn6-8" onclick="changeMode(6,8)">6×8</button>
+        <button class="mode-btn active" id="btn8-8" onclick="changeMode(8,8)">8×8</button>
+        <button class="mode-btn" id="btn10-10" onclick="changeMode(10,10)">10×10</button>
     </div>
 
-    <script>
-        const words = ["平安健康", "財源廣進", "萬事如意", "心想事成", "大吉大利", "步步高升", "招財進寶", "金玉滿堂", "龍馬精神", "福氣滿門"];
-        const fillerChars = "喜樂春福吉祥富貴安康順利發財年慶餘";
-        let selectedChars = [];
+    <div class="mode-switcher">
+        <button class="mode-btn active" id="btn-lang-zh" onclick="switchLang('zh')">中文</button>
+        <button class="mode-btn" id="btn-lang-en" onclick="switchLang('en')">EN</button>
+    </div>
+</div>
 
-        function initGame(cols, rows) {
-            const gridElement = document.getElementById('grid');
-            gridElement.innerHTML = '';
-            gridElement.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+<script>
+/* ===== 語言資料 ===== */
+let currentLang = 'zh';
 
-            // 計算動態字體：6欄大字，8欄小字
-            let fontSize = (cols === 6) ? "8vw" : "5.5vw";
-            let maxFontSize = (cols === 6) ? "32px" : "22px";
+const wordMap = {
+    zh: [
+        "平安健康","財源廣進","萬事如意","心想事成",
+        "大吉大利","步步高升","招財進寶","金玉滿堂",
+        "龍馬精神","福氣滿門"
+    ],
+    en: [
+        "HEALTH","WEALTH","HAPPINESS","SUCCESS","LUCK","PROSPERITY"
+    ]
+};
 
-            let totalCells = cols * rows;
-            let gridArray = Array(totalCells).fill('');
-            
-            // 隨機置入詞彙 (洗牌確保每次詞彙不同)
-            const currentWords = [...words].sort(() => Math.random() - 0.5).slice(0, (cols === 6 ? 4 : 8));
-            
-            currentWords.forEach(word => {
-                let placed = false;
-                let attempts = 0;
-                while (!placed && attempts < 100) {
-                    let pos = Math.floor(Math.random() * (totalCells - word.length));
-                    if (gridArray.slice(pos, pos + word.length).every(c => c === '')) {
-                        for (let i = 0; i < word.length; i++) gridArray[pos + i] = word[i];
-                        placed = true;
-                    }
-                    attempts++;
-                }
-            });
+const fillerMap = {
+    zh: "喜樂春福吉祥富貴安康順利發財年慶餘",
+    en: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+};
 
-            for (let i = 0; i < totalCells; i++) {
-                if (gridArray[i] === '') gridArray[i] = fillerChars[Math.floor(Math.random() * fillerChars.length)];
+/* ===== Word Search 核心 ===== */
+const directions = [
+    {x:1,y:0}, {x:0,y:1}, {x:1,y:1}
+];
+
+function createEmptyGrid(cols, rows) {
+    return Array.from({length: rows}, () => Array(cols).fill(''));
+}
+
+function canPlaceWord(grid, word, sx, sy, dir, cols, rows) {
+    for (let i=0;i<word.length;i++) {
+        const x = sx + dir.x*i;
+        const y = sy + dir.y*i;
+        if (x<0||x>=cols||y<0||y>=rows) return false;
+        if (grid[y][x] !== '' && grid[y][x] !== word[i]) return false;
+    }
+    return true;
+}
+
+function placeWord(grid, word, cols, rows) {
+    for (let i=0;i<100;i++) {
+        const dir = directions[Math.floor(Math.random()*directions.length)];
+        const sx = Math.floor(Math.random()*cols);
+        const sy = Math.floor(Math.random()*rows);
+        if (canPlaceWord(grid, word, sx, sy, dir, cols, rows)) {
+            for (let j=0;j<word.length;j++) {
+                grid[sy+dir.y*j][sx+dir.x*j] = word[j];
             }
-
-            gridArray.forEach((char) => {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.style.fontSize = fontSize;
-                // 電腦版文字大小上限
-                if (window.innerWidth > 450) cell.style.fontSize = maxFontSize;
-                cell.textContent = char;
-                
-                cell.onclick = () => {
-                    cell.classList.toggle('selected');
-                    if (cell.classList.contains('selected')) {
-                        selectedChars.push(char);
-                    } else {
-                        const idx = selectedChars.indexOf(char);
-                        if (idx > -1) selectedChars.splice(idx, 1);
-                    }
-                    updateDisplay();
-                };
-                gridElement.appendChild(cell);
-            });
-            resetSelection();
+            return;
         }
+    }
+}
 
-        function updateDisplay() {
-            document.getElementById('selectedChars').textContent = selectedChars.join('');
-        }
+function buildWordSearch(cols, rows) {
+    const grid = createEmptyGrid(cols, rows);
+    const words = [...wordMap[currentLang]].sort(()=>Math.random()-0.5)
+        .slice(0, cols>=10 ? 6 : 4);
 
-        function checkAnswer() {
-            const currentString = selectedChars.join('');
-            const msg = document.getElementById('status-msg');
-            if (words.includes(currentString)) {
-                msg.innerText = "✦ 找到祝福了 ✦";
-                msg.style.color = "var(--primary-red)";
-                setTimeout(resetSelection, 1000);
-            } else if (currentString.length > 0) {
-                msg.innerText = "這好像不是預設的祝福語，再試試看！";
-                msg.style.color = "#ccc";
-            }
-        }
+    words.forEach(w => placeWord(grid, w, cols, rows));
 
-        function resetSelection() {
-            selectedChars = [];
-            document.querySelectorAll('.cell').forEach(c => c.classList.remove('selected'));
-            document.getElementById('status-msg').innerText = "";
-            updateDisplay();
-        }
+    const filler = fillerMap[currentLang];
+    for (let y=0;y<rows;y++)
+        for (let x=0;x<cols;x++)
+            if (!grid[y][x])
+                grid[y][x] = filler[Math.floor(Math.random()*filler.length)];
 
-        function changeMode(c, r) {
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`btn${c}-${r}`).classList.add('active');
-            initGame(c, r);
-        }
+    return grid.flat();
+}
 
-        // 初始化
-        initGame(8, 8);
-        
-        // 視窗縮放時重新調整文字（避免電腦/手機切換時字體出錯）
-        window.addEventListener('resize', () => {
-            const activeBtn = document.querySelector('.mode-btn.active').id;
-            if (activeBtn === 'btn6-6') initGame(6, 6);
-            else if (activeBtn === 'btn6-8') initGame(6, 8);
-            else initGame(8, 8);
-        });
-    </script>
+/* ===== UI ===== */
+let selectedChars = [];
+let currentCols = 8;
+let currentRows = 8;
+
+function initGame(cols, rows) {
+    currentCols = cols;
+    currentRows = rows;
+    selectedChars = [];
+    document.getElementById('grid').innerHTML = '';
+    document.getElementById('grid').style.gridTemplateColumns = `repeat(${cols},1fr)`;
+
+    let fontSize = cols===6?"8vw":cols===8?"5.5vw":"4.5vw";
+    let maxFont = cols===6?"32px":cols===8?"22px":"18px";
+
+    const data = buildWordSearch(cols, rows);
+    data.forEach(char=>{
+        const c=document.createElement('div');
+        c.className='cell';
+        c.textContent=char;
+        c.style.fontSize=window.innerWidth>450?maxFont:fontSize;
+        c.onclick=()=>{
+            c.classList.toggle('selected');
+            c.classList.contains('selected')?
+                selectedChars.push(char):
+                selectedChars.splice(selectedChars.indexOf(char),1);
+            document.getElementById('selectedChars').textContent=selectedChars.join('');
+        };
+        document.getElementById('grid').appendChild(c);
+    });
+}
+
+function checkAnswer() {
+    const str = selectedChars.join('');
+    const msg = document.getElementById('status-msg');
+    if (wordMap[currentLang].includes(str)) {
+        msg.textContent = "✦ 找到祝福了 ✦";
+        msg.style.color = "var(--primary-red)";
+    } else {
+        msg.textContent = "再試試看";
+        msg.style.color = "#ccc";
+    }
+}
+
+function changeMode(c,r){
+    document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById(`btn${c}-${r}`).classList.add('active');
+    initGame(c,r);
+}
+
+function switchLang(lang){
+    currentLang = lang;
+    document.getElementById('btn-lang-zh').classList.toggle('active',lang==='zh');
+    document.getElementById('btn-lang-en').classList.toggle('active',lang==='en');
+    initGame(currentCols,currentRows);
+}
+
+/* ===== Start ===== */
+initGame(8,8);
+</script>
+
 </body>
 </html>
